@@ -1,5 +1,5 @@
 <script>
-    console.log("10")
+    console.log("11")
     // Функция для добавления нового комментария
     function addComment(comment) {
         const repoOwner = 'IvanBaobab';
@@ -26,7 +26,7 @@
 
                 // Отправляем обновленное содержимое обратно в репозиторий
                 fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`, {
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         'Authorization': `token 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`,
                         'Content-Type': 'application/json',
