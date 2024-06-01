@@ -1,0 +1,19 @@
+<script>
+    fetch('DataBase.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            // Теперь можно работать с данными
+            const comments = data.comments;
+            const users = data.users;
+            // Ваши дальнейшие действия с comments и users
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+</script>
