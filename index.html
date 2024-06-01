@@ -1,16 +1,62 @@
 <script>
-    fetch('DataBase.json')
-        .then(response => response.json())
-        .then(data => {
-            console.log("hello");
-            console.log(data);
-            const newComment = {
-                text: "Hello",
-                date: new Date().toISOString()
-            };
+    // Функция для добавления нового комментария
+    function addComment(comment) {
+        const repoOwner = 'IvanBaobab';
+        const repoName = 'TestDataBase';
+        const path = 'DataBase.json';
 
-            data.comments.push(newComment);
-            saveData(data);
-            return data;
-        })
+        // Запрос на получение текущего содержимого файла DataBase.json
+        fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Декодируем содержимое файла из base64
+                const content = JSON.parse(atob(data.content));
+
+                // Добавляем новый комментарий
+                content.comments.push(comment);
+
+                // Преобразуем обновленное содержимое в строку JSON
+                const updatedContent = JSON.stringify(content, null, 2);
+
+                // Отправляем обновленное содержимое обратно в репозиторий
+                fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token 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`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Add new comment via API',
+                        content: btoa(updatedContent), // Кодируем содержимое в base64
+                        sha: data.sha // SHA хэш текущей версии файла для обновления
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        console.log('Comment added successfully');
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with adding the comment:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    // Пример добавления нового комментария
+    const newComment = {
+        text: 'Hello from GitHub API!',
+        date: new Date().toISOString(),
+        user: 'username'
+    };
+
+    addComment(newComment);
 </script>
